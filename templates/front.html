@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        .chat {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat span {
+            margin-bottom: 10px;
+        }
+        
+        html,
+        body {
+            height: 100%;
+        }
+        
+        .info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        form {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        input,
+        select {
+            padding: 5px;
+            margin-bottom: 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #eee;
+        }
+        
+        input::placeholder {
+            color: #eee;
+        }
+        
+        button {
+            display: block;
+            width: 200px;
+            padding: 10px;
+            margin: 20px auto 0;
+            border: none;
+            border-radius: 5px;
+            background: #1c87c9;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        @media (min-width: 568px) {
+            .info {
+                flex-flow: row wrap;
+                justify-content: space-between;
+            }
+            input {
+                width: 46%;
+            }
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="chat"></div>
+
+    <div style="visibility: hidden" id="alerta" class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+        <div class="text-center">
+            Existem pacientes com risco de COVID!
+        </div>
+    </div>
+
+    <div class="p-2 text-center" style="margin-right: 400px; margin-left: 400px;">
+        <p class="h1 mb-3">Pacientes Monitorados</p>
+        <button type="button" class="btn btn-success btn-block mb-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        Cadastrar paciente
+      </button>
+
+        <button type="button" class="btn btn-warning btn-block mb-3" data-bs-toggle="modal" data-bs-target="#staticBackdropExcluir">
+        Excluir paciente
+      </button>
+
+        <div class="p-3 mb-4 bg-dark">
+            <div class="info row">
+                <div id="lista-nome" class="col-md-6 text-white h5"></div>
+                <div id="lista-saturacao" class="col-md-6 text-white h5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de cadastro de paciente -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">
+                        Cadastrar paciente
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formCadastrar">
+                    <div class="modal-body">
+                        <input type="text" placeholder="insira o nome" class="form-control btn-block" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Fechar
+              </button>
+                        <button id="btnCadastrar" type="submit" class="btn btn-primary">Cadastrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal excluir -->
+    <div class="modal fade" id="staticBackdropExcluir" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">
+                        Excluir paciente
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formExcluir">
+                    <div class="modal-body">
+                        <input type="text" placeholder="insira o nome" class="form-control btn-block" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Fechar
+              </button>
+                        <button id="btnExcluir" type="submit" class="btn btn-primary">Excluir</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Importação do icone do alerta superior -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </symbol>
+      </svg>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+    <script>
+        window.onload = function() {
+            //toda vez que a pagina carrega, mostrar todos itens armazenados
+            const socket = io("http://26.183.98.240:5000"); //avisa ao backend que tá conectado
+
+            socket.on("connect", () => { //envio de mensagem que o cliente tá conectado 
+                socket.send("Usuário conectado ao socket!");
+            });
+
+            document
+                .querySelector("#formCadastrar")
+                .addEventListener("submit", function(event) { //Evento que envia o formulario de cadastro
+
+                    socket.emit("sendMessage", { //função do back que recebe o nome do formulario
+                        temp: 0,
+                        nome: event.target[0].value,
+                        oximetro: 0,
+                    });
+                    event.target[0].value = ""; //limpa o cache do nome do formulário
+                });
+
+            document
+                .querySelector("#formExcluir")
+                .addEventListener("submit", function(event) { //Evento que envia o formulario de exclusão de paciente
+
+                    socket.emit("sendNameDelete", { //função do back que recebe o nome do paciente a ser excluido
+                        nome: event.target[0].value,
+                    });
+                    event.target[0].value = "";
+                });
+
+            socket.on("message", (msgs) => { //Função que recebe os nomes lidos do arquivo para mostrar na tela
+                var lista_nome = document.getElementById("lista-nome");
+                var lista_saturacao = document.getElementById("lista-saturacao");
+                console.log(msgs);
+                var div_nome = document.createElement("div");
+                var div_saturacao = document.createElement("div");
+
+                for (msg of msgs) { // laço de repertição pra pegar cada paciente da lista
+                    var nome = document.createElement("p");
+                    var saturacao = document.createElement("p");
+                    nome.innerHTML = "nome: " + msg.nome // adicionado o nome na div de exibição na tela
+                    saturacao.innerHTML = "saturação: " + msg.oximetro + "O²" + " " + msg.temperatura + "ºC"; // adicionado saturaçãp na div de exibição na tela
+                    if (parseInt(msg.oximetro) <= 90 && parseFloat(msg.temperatura) >= 37.5) { //condição para diferenciar os pacientes com oximetria inferior a 90 com a cor vermelha
+                        document.getElementById('alerta').style.visibility = 'visible'; // alerta na parte superior da tela, sinalizando que tem pacientes com risco de covid
+                        nome.classList.add("bg-danger");
+                        nome.classList.add("mb-3");
+                        nome.classList.add("p-1");
+                        saturacao.classList.add("bg-danger");
+                        saturacao.classList.add("mb-3");
+                        saturacao.classList.add("p-1");
+
+                    }
+                    div_nome.append(nome); //adicionando o nome na div do nome
+                    div_saturacao.append(saturacao); //adicionando o nome na div da saturação
+                }
+                lista_nome.append(div_nome);
+                lista_saturacao.append(div_saturacao);
+            });
+        };
+    </script>
+</body>
+
+</html>
